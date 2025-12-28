@@ -1,0 +1,24 @@
+# Dependencias
+node_modules/
+
+# Base de datos
+*.sqlite
+*.db
+
+# Logs
+logs/
+*.log
+
+# Variables de entorno
+.env
+.env.local
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo

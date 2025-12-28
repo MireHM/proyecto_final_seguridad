@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Inventario Seguro - CIA Triad + MFA</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <!-- PANTALLA DE LOGIN -->
+        <div id="loginScreen" class="screen active">
+            <div class="card">
+                <div class="security-badge">
+                    <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                    </svg>
+                </div>
+                <h1>Sistema de Inventario Seguro</h1>
+                <p class="subtitle">Implementación CIA Triad + MFA</p>
+                
+                <div class="security-features">
+                    <div class="feature">
+                        <span class="icon">🔒</span>
+                        <span>Confidencialidad</span>
+                    </div>
+                    <div class="feature">
+                        <span class="icon">✓</span>
+                        <span>Integridad</span>
+                    </div>
+                    <div class="feature">
+                        <span class="icon">📊</span>
+                        <span>Disponibilidad</span>
+                    </div>
+                    <div class="feature">
+                        <span class="icon">🔐</span>
+                        <span>MFA Activo</span>
+                    </div>
+                </div>
+
+                <form id="loginForm">
+                    <div class="form-group">
+                        <label for="username">Usuario</label>
+                        <input type="text" id="username" required placeholder="Ingrese su usuario">
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Contraseña</label>
+                        <input type="password" id="password" required placeholder="Ingrese su contraseña">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Iniciar Sesión</button>
+                </form>
+
+                <div class="demo-credentials">
+                    <p><strong>Usuario de prueba:</strong></p>
+                    <p>Usuario: <code>admin</code></p>
+                    <p>Contraseña: <code>Admin123!</code></p>
+                </div>
+
+                <div class="login-footer">
+                    <p>¿No tienes cuenta? <a href="#" id="showRegister">Registrarse</a></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- PANTALLA DE REGISTRO -->
+        <div id="registerScreen" class="screen">
+            <div class="card">
+                <h2>Crear Cuenta</h2>
+                
+                <!-- Políticas de contraseña -->
+                <div class="password-policies">
+                    <h3>📋 Políticas de Contraseñas</h3>
+                    <div class="policy-grid">
+                        <div class="policy-item">
+                            <span class="policy-icon">🔤</span>
+                            <div>
+                                <strong>Complejidad</strong>
+                                <p>Mín. 8 caracteres con mayúsculas, minúsculas, números y símbolos</p>
+                            </div>
+                        </div>
+                        <div class="policy-item">
+                            <span class="policy-icon">📏</span>
+                            <div>
+                                <strong>Longitud</strong>
+                                <p>8-128 caracteres (recomendado: 12+)</p>
+                            </div>
+                        </div>
+                        <div class="policy-item">
+                            <span class="policy-icon">⏰</span>
+                            <div>
+                                <strong>Tiempo de Vida</strong>
+                                <p>Expira en 90 días</p>
+                            </div>
+                        </div>
+                        <div class="policy-item">
+                            <span class="policy-icon">📜</span>
+                            <div>
+                                <strong>Historial</strong>
+                                <p>No puede reutilizar últimas 5 contraseñas</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <form id="registerForm">
+                    <div class="form-group">
+                        <label for="regUsername">Usuario</label>
+                        <input type="text" id="regUsername" required placeholder="Mínimo 3 caracteres">
+                    </div>
+                    <div class="form-group">
+                        <label for="regEmail">Email</label>
+                        <input type="email" id="regEmail" required placeholder="correo@ejemplo.com">
+                    </div>
+                    <div class="form-group">
+                        <label for="regPassword">Contraseña</label>
+                        <input type="password" id="regPassword" required 
+                               placeholder="Ingrese una contraseña segura">
+                        <!-- Medidor de fuerza -->
+                        <div class="password-strength-meter">
+                            <div class="strength-bar" id="strengthBar"></div>
+                        </div>
+                        <div id="strengthText" class="strength-text"></div>
+                        <div id="passwordErrors" class="password-errors"></div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Registrarse</button>
+                    <button type="button" class="btn btn-secondary" id="backToLogin">Volver al Login</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- PANTALLA DE MFA -->
+        <div id="mfaScreen" class="screen">
+            <div class="card">
+                <div class="mfa-icon">🔐</div>
+                <h2>Autenticación de Dos Factores</h2>
+                <p>Ingrese el código de 6 dígitos de su aplicación autenticadora</p>
+                <form id="mfaForm">
+                    <div class="form-group">
+                        <input type="text" id="mfaCode" required placeholder="000000" 
+                               maxlength="6" pattern="[0-9]{6}" class="mfa-input">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Verificar</button>
+                    <button type="button" class="btn btn-secondary" id="cancelMfa">Cancelar</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- PANTALLA PRINCIPAL -->
+        <div id="mainScreen" class="screen">
+            <nav class="navbar">
+                <div class="nav-brand">
+                    <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                    </svg>
+                    <span>Inventario Seguro</span>
+                </div>
+                <div class="nav-user">
+                    <span id="userDisplay"></span>
+                    <button class="btn btn-small" id="rolesBtn">👥 Gestión de Roles</button>
+                    <button class="btn btn-small" id="changePasswordBtn">🔑 Cambiar Contraseña</button>
+                    <button class="btn btn-small" id="mfaButton">🔐 Configurar MFA</button>
+                    <button class="btn btn-small btn-danger" id="logoutBtn">Cerrar Sesión</button>
+                </div>
+            </nav>
+
+            <div class="main-content">
+                <div class="header-actions">
+                    <h2>Gestión de Inventario</h2>
+                    <div class="actions">
+                        <input type="text" id="searchInput" placeholder="Buscar productos..." class="search-input">
+                        <button class="btn btn-primary" id="addItemBtn">+ Agregar Producto</button>
+                        <button class="btn btn-secondary" id="statsBtn">📊 Estadísticas</button>
+                    </div>
+                </div>
+
+                <!-- Tabla de inventario -->
+                <div class="table-container">
+                    <table id="inventoryTable">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nombre</th>
+                                <th>Descripción</th>
+                                <th>Cantidad</th>
+                                <th>Precio</th>
+                                <th>Categoría</th>
+                                <th>Creado por</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="inventoryBody">
+                            <!-- Se llena dinámicamente -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Estadísticas -->
+                <div id="statsPanel" class="stats-panel" style="display: none;">
+                    <h3>Estadísticas del Inventario</h3>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <h4>Total Items</h4>
+                            <p id="statTotalItems">0</p>
+                        </div>
+                        <div class="stat-card">
+                            <h4>Cantidad Total</h4>
+                            <p id="statTotalQuantity">0</p>
+                        </div>
+                        <div class="stat-card">
+                            <h4>Valor Total</h4>
+                            <p id="statTotalValue">$0.00</p>
+                        </div>
+                        <div class="stat-card">
+                            <h4>Precio Promedio</h4>
+                            <p id="statAvgPrice">$0.00</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MODAL PARA AGREGAR/EDITAR ITEM -->
+        <div id="itemModal" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h3 id="modalTitle">Agregar Producto</h3>
+                <form id="itemForm">
+                    <input type="hidden" id="itemId">
+                    <div class="form-group">
+                        <label for="itemName">Nombre *</label>
+                        <input type="text" id="itemName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="itemDescription">Descripción</label>
+                        <textarea id="itemDescription" rows="3"></textarea>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="itemQuantity">Cantidad *</label>
+                            <input type="number" id="itemQuantity" required min="0">
+                        </div>
+                        <div class="form-group">
+                            <label for="itemPrice">Precio *</label>
+                            <input type="number" id="itemPrice" required min="0" step="0.01">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="itemCategory">Categoría *</label>
+                        <select id="itemCategory" required>
+                            <option value="">Seleccione una categoría</option>
+                            <option value="Electrónica">Electrónica</option>
+                            <option value="Ropa">Ropa</option>
+                            <option value="Alimentos">Alimentos</option>
+                            <option value="Herramientas">Herramientas</option>
+                            <option value="Otros">Otros</option>
+                        </select>
+                    </div>
+                    <div class="modal-actions">
+                        <button type="submit" class="btn btn-primary">Guardar</button>
+                        <button type="button" class="btn btn-secondary" id="cancelBtn">Cancelar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- MODAL PARA CONFIGURAR MFA -->
+        <div id="mfaSetupModal" class="modal">
+            <div class="modal-content">
+                <span class="close" id="closeMfaSetup">&times;</span>
+                <h3>Configurar Autenticación de Dos Factores</h3>
+                
+                <div id="mfaStep1" class="mfa-step">
+                    <p>1. Descarga Google Authenticator o similar en tu móvil</p>
+                    <p>2. Haz clic en "Generar Código QR"</p>
+                    <button class="btn btn-primary" id="generateQrBtn">Generar Código QR</button>
+                </div>
+
+                <div id="mfaStep2" class="mfa-step" style="display: none;">
+                    <p>Escanea este código QR con tu aplicación autenticadora:</p>
+                    <div id="qrCodeContainer" class="qr-container"></div>
+                    <p><strong>Código manual:</strong></p>
+                    <code id="manualSecret"></code>
+                    
+                    <div class="form-group">
+                        <label for="verifyToken">Ingresa el código de 6 dígitos para verificar:</label>
+                        <input type="text" id="verifyToken" placeholder="000000" maxlength="6">
+                    </div>
+                    <button class="btn btn-primary" id="verifyMfaBtn">Activar MFA</button>
+                    <button class="btn btn-danger" id="disableMfaBtn" style="display: none;">Desactivar MFA</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- MODAL PARA CAMBIAR CONTRASEÑA -->
+        <div id="changePasswordModal" class="modal">
+            <div class="modal-content">
+                <span class="close" id="closeChangePassword">&times;</span>
+                <h3>Cambiar Contraseña</h3>
+                
+                <div class="password-policies-mini">
+                    <p><strong>Requisitos:</strong></p>
+                    <ul>
+                        <li>Mínimo 8 caracteres</li>
+                        <li>Mayúsculas y minúsculas</li>
+                        <li>Al menos un número</li>
+                        <li>Al menos un carácter especial</li>
+                        <li>No puede reutilizar últimas 5 contraseñas</li>
+                    </ul>
+                </div>
+
+                <form id="changePasswordForm">
+                    <div class="form-group">
+                        <label for="currentPassword">Contraseña Actual</label>
+                        <input type="password" id="currentPassword" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="newPassword">Nueva Contraseña</label>
+                        <input type="password" id="newPassword" required>
+                        <div class="password-strength-meter">
+                            <div class="strength-bar" id="newPasswordStrengthBar"></div>
+                        </div>
+                        <div id="newPasswordStrengthText" class="strength-text"></div>
+                        <div id="newPasswordErrors" class="password-errors"></div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="confirmPassword">Confirmar Nueva Contraseña</label>
+                        <input type="password" id="confirmPassword" required>
+                    </div>
+                    
+                    <div class="modal-actions">
+                        <button type="submit" class="btn btn-primary">Cambiar Contraseña</button>
+                        <button type="button" class="btn btn-secondary" id="cancelChangePassword">Cancelar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Modal de Gestión de Roles -->
+        <div id="rolesModal" class="modal">
+            <div class="modal-content large">
+                <span class="close" id="closeRolesModal">&times;</span>
+                <h3>Gestión de Roles y Permisos</h3>
+                
+                <div class="tabs">
+                    <button class="tab-button active" data-tab="roles-list">Lista de Roles</button>
+                    <button class="tab-button" data-tab="roles-permissions">Matriz de Permisos</button>
+                    <button class="tab-button" data-tab="roles-create">Crear Rol</button>
+                </div>
+
+                <!-- Tab: Lista de Roles -->
+                <div id="roles-list" class="tab-content active">
+                    <h4>Roles del Sistema</h4>
+                    <div id="rolesListContainer">
+                        <p>Cargando roles...</p>
+                    </div>
+                </div>
+
+                <!-- Tab: Matriz de Permisos -->
+                <div id="roles-permissions" class="tab-content">
+                    <h4>Matriz de Roles y Permisos</h4>
+                    <p class="info-text">
+                        Esta matriz muestra todos los roles del sistema y sus permisos asociados.
+                        Los roles marcados como "Sistema" no pueden ser modificados o eliminados.
+                    </p>
+                    <div id="permissionsMatrixContainer">
+                        <p>Cargando matriz...</p>
+                    </div>
+                </div>
+
+                <!-- Tab: Crear Rol -->
+                <div id="roles-create" class="tab-content">
+                    <h4>Crear Nuevo Rol</h4>
+                    <form id="createRoleForm">
+                        <div class="form-group">
+                            <label for="roleName">Nombre del Rol *</label>
+                            <input type="text" id="roleName" required placeholder="Ej: SUPERVISOR">
+                        </div>
+                        <div class="form-group">
+                            <label for="roleDescription">Descripción *</label>
+                            <textarea id="roleDescription" required placeholder="Descripción del rol y sus responsabilidades" rows="3"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Permisos del Rol *</label>
+                            <p class="info-text">Selecciona los permisos que tendrá este rol</p>
+                            <div id="permissionsCheckboxes">
+                                <p>Cargando permisos disponibles...</p>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Crear Rol</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Notificaciones -->
+        <div id="notification" class="notification"></div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
